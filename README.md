@@ -11,29 +11,40 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages). 
 -->
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+This is simple NTP server with offers offset feature. This may helped test system 
+based on time.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+Offset of time may be changed or UDP default server port.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add library to your project by pub.dev.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Using the server with default settings (UDP port 123 and 0 sec. offset):
 
 ```dart
-const like = 'sample';
+void main() {
+  NTPServer srv = NTPServer();
+  srv.start();
+}
+```
+
+Using the server with nondefault 1234 UDP port and 1h offset (3600 in seconds):
+
+```dart
+void main() {
+  NTPServer srv = NTPServer(offset: Duration(seconds: 3600));
+  srv.start(1234);
+}
 ```
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+More ifno you can find in RFC5905 https://datatracker.ietf.org/doc/html/rfc5905
+
+## License
+License under MIT

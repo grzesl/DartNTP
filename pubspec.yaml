@@ -1,7 +1,7 @@
 name: dart_ntp
-description: A starting point for Dart libraries or applications.
+description: This is simple NTP server with offers offset feature. This may helped test system based on time.
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/grzesl/DartNTP
 
 environment:
   sdk: ^3.8.1
@@ -9,8 +9,6 @@ environment:
 # Add regular dependencies here.
 dependencies:
   udp: ^5.0.3
-  timezone: ^0.10.1
-  # path: ^1.8.0
 
 dev_dependencies:
   lints: ^5.0.0
