@@ -1,18 +1,27 @@
+import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'dart:core';
 
 import 'package:dart_ntp/src/dart_ntp_message.dart';
 
 class NTPServer {
-  final Duration offset;
-  final DateTime datetime_epoch = DateTime.utc(1900, 1, 1, 0, 0, 0);
+  final DateTime datetimeEpoch = DateTime.utc(1900, 1, 1, 0, 0, 0);
+  StreamController<int> controller = StreamController<int>();
+  late Stream<int> stream;
+  int _numberOfCalls = 0;
+  RawDatagramSocket? _socket;
+  bool isRunning = false;
 
-  NTPServer({this.offset = const Duration(seconds: 0)});
+  NTPServer() {
+    stream = controller.stream;
+  }
 
-  int dateTimeToNTP(DateTime datetimeNow) {
-    Duration time_diff = datetimeNow.difference(datetime_epoch);
-    int timeS = time_diff.inSeconds + offset.inSeconds;
+  int dateTimeToNTP(
+    DateTime datetimeNow, {
+    offset = const Duration(seconds: 0),
+  }) {
+    Duration timeDiff = datetimeNow.difference(datetimeEpoch);
+    int timeS = (timeDiff.inSeconds + offset.inSeconds).toInt();
     return timeS;
   }
 
@@ -22,7 +31,23 @@ class NTPServer {
     return timeFrac.toInt();
   }
 
-  void start({int port = 123}) async {
+  void stop() {
+    isRunning = false;
+    if (_socket != null) {
+      _socket!.close();
+    }
+    _numberOfCalls = 0;
+    controller.sink.add(_numberOfCalls);
+  }
+
+  bool isRun() {
+    return isRunning;
+  }
+
+  void start({
+    int port = 123,
+    Duration offset = const Duration(seconds: 0),
+  }) async {
     RawDatagramSocket.bind(InternetAddress.anyIPv4, port).then((
       RawDatagramSocket socket,
     ) {
@@ -31,7 +56,6 @@ class NTPServer {
         Datagram? d = socket.receive();
         if (d == null) return;
         NTPMessage message = NTPMessage.fromTypedData(d.data);
-
         NTPMessage ntpResp = NTPMessage(1, 3, 4);
         ntpResp.stratum = 1;
         ntpResp.poll = 0;
@@ -48,11 +72,19 @@ class NTPServer {
         ntpResp.reciveTimestampFrac = dateTimeToNTPFrac(datetimeRecive);
 
         DateTime now = DateTime.now();
-        ntpResp.transmitTimestamp = dateTimeToNTP(now);
+        ntpResp.transmitTimestamp = dateTimeToNTP(now, offset: offset);
         ntpResp.transmitTimestampFrac = dateTimeToNTPFrac(now);
+
+        _numberOfCalls++;
+        controller.sink.add(_numberOfCalls);
 
         socket.send(ntpResp.toList(), d.address, d.port);
       });
+
+      _socket = socket;
+      isRunning = true;
+      _numberOfCalls = 0;
+      controller.sink.add(_numberOfCalls);
     });
   }
 }
