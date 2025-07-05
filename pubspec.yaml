@@ -1,6 +1,6 @@
 name: dart_ntp
 description: This is simple NTP server with offers offset feature. This may helped test system based on time.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/grzesl/DartNTP
 
 environment:
