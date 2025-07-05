@@ -36,4 +36,4 @@ void main() {
 More informations you can find in RFC5905 https://datatracker.ietf.org/doc/html/rfc5905
 
 ## License
-License under MIT
+Licensed under MIT
